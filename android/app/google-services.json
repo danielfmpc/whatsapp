@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "509986909545",
+    "firebase_url": "https://whatsapp-f18b2.firebaseio.com",
+    "project_id": "whatsapp-f18b2",
+    "storage_bucket": "whatsapp-f18b2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:509986909545:android:9f4347d9541e539ae321f8",
+        "android_client_info": {
+          "package_name": "br.com.danielfmpc.whatsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "509986909545-9eauhcqs98isu4qgeq8c470ig3nfvlrn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUifISxZHKpfCxm4rlRDuAqRfAiYv9X_s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "509986909545-9eauhcqs98isu4qgeq8c470ig3nfvlrn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
