@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:whatsapp/Cadastro.dart';
-import 'package:whatsapp/Home.dart';
 import 'package:whatsapp/model/Usuario.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -46,12 +45,7 @@ class _LoginState extends State<Login> {
         email: usuario.email,
         password: usuario.senha
     ).then((firebaseUser){
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Home()
-          )
-        );
+        Navigator.pushReplacementNamed(context, "/home");
       }
     ).catchError((error){
         setState(() {
@@ -66,12 +60,7 @@ class _LoginState extends State<Login> {
 //    auth.signOut();
     FirebaseUser usuarioLogado = await auth.currentUser();
     if(usuarioLogado != null){
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => Home()
-          )
-      );
+      Navigator.pushReplacementNamed(context, "/home");
     }
   }
 
@@ -102,7 +91,16 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(bottom: 28),
+                  padding: EdgeInsets.only(top: 16),
+                  child: Center(
+                    child: Text(
+                      _mensagemErro,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 5),
                   child: TextField(
                     controller: _controllerEmail,
                     autofocus: true,
@@ -163,15 +161,7 @@ class _LoginState extends State<Login> {
                     },
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(top: 16),
-                  child: Center(
-                    child: Text(
-                      _mensagemErro,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                )
+
               ],
             ),
           ),
