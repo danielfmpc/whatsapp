@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:whatsapp/model/Conversa.dart';
+import 'package:whatsapp/model/Usuario.dart';
 
 class Conversas extends StatefulWidget {
   @override
@@ -9,18 +10,41 @@ class Conversas extends StatefulWidget {
 }
 
 class _ConversasState extends State<Conversas> {
-  // ignore: close_sinks
-  final _controller = StreamController<QuerySnapshot>.broadcast(
+  Firestore db = Firestore.instance;
+  String _idUsuarioLogado;
+  // ignore: close_sinks  
+  final _controller = StreamController<QuerySnapshot>.broadcast();
 
-  );
-  List<Conversa> _listaConversas = List();
   @override
   void initState() {
     super.initState();
-    Conversa conversa = Conversa();
-    conversa.nome ="Ana Clara";
-    conversa.mensagem = "Olá, blz";
-    conversa.caminhoFoto = "";
+    _recuperarDadosUsuario();
+  }
+
+  _recuperarDadosUsuario() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+    _idUsuarioLogado = usuarioLogado.uid;
+    _adicionarListenerCoversas();
+
+  }
+
+  Stream<QuerySnapshot> _adicionarListenerCoversas(){
+    final stream = db.collection("conversas")
+    .document(_idUsuarioLogado)
+    .collection("ultima_conversa")
+    .snapshots();
+
+    stream.listen((dados){
+      _controller.add(dados);
+    });
+
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.close();
   }
 
   @override
@@ -59,25 +83,42 @@ class _ConversasState extends State<Conversas> {
               );
             }
             return ListView.builder(
-                itemCount: _listaConversas.length,
+                itemCount: snapshot.data.documents.length,
                 itemBuilder: (context, indice){
-                  Conversa conversa = _listaConversas[indice];
+                  List<DocumentSnapshot> conversas = querySnapshot.documents.toList();
+                  DocumentSnapshot item = conversas[indice];
+                  String url = item["caminhoFoto"];
+                  String mensagem = item["mensagem"];
+                  String tipo = item["tipo"];
+                  String nome = item["nome"];
+                  String idDestinatario = item["idDestinatario"];
+
+                  Usuario usuario = Usuario();
+                  usuario.nome = nome ;
+                  usuario.idUsuario = idDestinatario;
+                  usuario.urlImagem = url;
+
                   return ListTile(
+                     onTap: (){
+                      Navigator.pushNamed(context, "/mensagens", arguments: usuario);
+                    },
                     contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                     leading: CircleAvatar(
                       maxRadius: 30,
                       backgroundColor: Colors.grey,
-                      backgroundImage: NetworkImage( conversa.caminhoFoto ),
+                      backgroundImage: NetworkImage( url ),
                     ),
                     title: Text(
-                      conversa.nome,
+                      nome,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16
                       ),
                     ),
                     subtitle: Text(
-                        conversa.mensagem,
+                        tipo == "texto"
+                        ? mensagem
+                        : "Imagem ...",
                         style: TextStyle(
                             color: Colors.grey,
                             fontSize: 14

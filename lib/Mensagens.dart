@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,12 +22,30 @@ class Mensagens extends StatefulWidget {
 }
 
 class _MensagensState extends State<Mensagens> {
-  File _imagem;
   bool _subindoImagem = false;
   Firestore db = Firestore.instance;
   TextEditingController _controllerMensagem = TextEditingController();
   String _idUsuarioLogado;
   String _idUsuarioDestinatario;
+
+  final _controller = StreamController<QuerySnapshot>.broadcast();
+  ScrollController _scrollController = ScrollController();
+
+  Stream<QuerySnapshot> _adicionarListenerMensagem(){
+    final stream =db
+          .collection("mensagens")
+          .document(_idUsuarioLogado)
+          .collection(_idUsuarioDestinatario)
+          .snapshots();
+
+    stream.listen((dados){
+      _controller.add(dados);
+      Timer(Duration(seconds: 1), (){
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      });
+    });
+
+  }
 
   _enviarMensagem() {
     String textoMensagem = _controllerMensagem.text;
@@ -128,11 +148,11 @@ class _MensagensState extends State<Mensagens> {
     FirebaseUser usuarioLogado = await auth.currentUser();
     _idUsuarioLogado = usuarioLogado.uid;
     _idUsuarioDestinatario = widget.contato.idUsuario;
+    _adicionarListenerMensagem();
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperarDadosUsuario();
   }
@@ -160,12 +180,18 @@ class _MensagensState extends State<Mensagens> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(32),
                     ),
-                    prefixIcon: _subindoImagem ?
+                    suffixIcon: _subindoImagem ?
                     CircularProgressIndicator()
                     : IconButton(icon: Icon(Icons.camera_alt), onPressed: _enviarFoto)),
               ),
             ),
           ),
+          Platform.isIOS ? CupertinoButton(
+            onPressed: _enviarMensagem,
+            child: Text("Enviar"),
+
+          )
+          : 
           FloatingActionButton(
             onPressed: _enviarMensagem,
             backgroundColor: Color(0xff075E54),
@@ -179,11 +205,7 @@ class _MensagensState extends State<Mensagens> {
       ),
     );
     var stream = StreamBuilder(
-      stream: db
-          .collection("mensagens")
-          .document(_idUsuarioLogado)
-          .collection(_idUsuarioDestinatario)
-          .snapshots(),
+      stream: _controller.stream,
       // ignore: missing_return
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
@@ -208,6 +230,7 @@ class _MensagensState extends State<Mensagens> {
             } else {
               return Expanded(
                 child: ListView.builder(
+                  controller: _scrollController,
                     itemCount: querySnapshot.documents.length,
                     itemBuilder: (context, indice) {
                       List<DocumentSnapshot> mensagens = querySnapshot.documents.toList();

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/telas/Contatos.dart';
@@ -52,7 +54,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _verificarUsuarioLogado();
     _recuperarDadosUsuario();
@@ -63,7 +64,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         title: Text("WhatsApp", textAlign: TextAlign.center,),
-
+        elevation: Platform.isIOS ? 0 : 4,
         bottom: TabBar(
           indicatorWeight: 4,
           labelStyle: TextStyle(
@@ -71,7 +72,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             fontWeight: FontWeight.bold
           ),
           controller: _tabController,
-          indicatorColor: Colors.white,
+          indicatorColor: Platform.isIOS ? Colors.grey[400] : Colors.white,
           tabs: <Widget>[
             Tab(text: "Conversas",),
             Tab(text: "Contatos",),
