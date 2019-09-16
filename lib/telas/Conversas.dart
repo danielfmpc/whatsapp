@@ -33,6 +33,7 @@ class _ConversasState extends State<Conversas> {
     final stream = db.collection("conversas")
     .document(_idUsuarioLogado)
     .collection("ultima_conversa")
+    .orderBy("data", descending: false)
     .snapshots();
 
     stream.listen((dados){

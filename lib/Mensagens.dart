@@ -27,15 +27,17 @@ class _MensagensState extends State<Mensagens> {
   TextEditingController _controllerMensagem = TextEditingController();
   String _idUsuarioLogado;
   String _idUsuarioDestinatario;
+  String _data = DateTime.now().second.toString();
 
   final _controller = StreamController<QuerySnapshot>.broadcast();
   ScrollController _scrollController = ScrollController();
 
   Stream<QuerySnapshot> _adicionarListenerMensagem(){
-    final stream =db
+    final stream = db
           .collection("mensagens")
           .document(_idUsuarioLogado)
           .collection(_idUsuarioDestinatario)
+          .orderBy("data", descending: false)
           .snapshots();
 
     stream.listen((dados){
@@ -55,6 +57,7 @@ class _MensagensState extends State<Mensagens> {
       mensagem.mensagem = textoMensagem;
       mensagem.urlImagem = "";
       mensagem.tipo = "texto";
+      mensagem.data = _data;
 
       // Salvar mensagem para o remetente
       _salvarMensagem(_idUsuarioLogado, _idUsuarioDestinatario, mensagem);
@@ -75,6 +78,7 @@ class _MensagensState extends State<Mensagens> {
     cRemetente.nome = widget.contato.nome;
     cRemetente.caminhoFoto = widget.contato.urlImagem;
     cRemetente.tipo = msg.tipo;
+    cRemetente.data = msg.data;
     cRemetente.salvar();
 
     // Salvar mensagem para o destinatario
@@ -85,6 +89,7 @@ class _MensagensState extends State<Mensagens> {
     cDestinatario.nome = widget.contato.nome;
     cDestinatario.caminhoFoto = widget.contato.urlImagem;
     cDestinatario.tipo = msg.tipo;
+    cDestinatario.data = msg.data;
     cDestinatario.salvar();
   }
 

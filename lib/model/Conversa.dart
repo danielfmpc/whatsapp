@@ -7,6 +7,8 @@ class Conversa{
   String _nome;
   String _mensagem;
   String _caminhoFoto;
+  String _data;
+
 
 
   Conversa();
@@ -28,8 +30,16 @@ class Conversa{
       "nome": this.nome,
       "mensagem": this.mensagem,
       "caminhoFoto": this.caminhoFoto,
+      "data": this.data,
+
     };
     return map;
+  }
+
+  String get data => _data;
+
+  set data(String value) {
+    _data = value;
   }
 
 
